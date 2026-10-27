@@ -42,6 +42,8 @@ class MinecraftCapture:
         self._latest_frame = None
         self._frame_lock = Lock()
         
+        self.window_bounds = None
+        
     def _publish_frame(self, frame):
         with self._frame_lock:
             self._latest_frame = frame
@@ -57,6 +59,15 @@ class MinecraftCapture:
         
         if minecraft_window is None:
             raise RuntimeError("Minecraft window not found!")
+        
+        frame = minecraft_window.frame()
+        
+        self.window_bounds = {
+            "x": frame.origin.x,
+            "y": frame.origin.y,
+            "width": frame.size.width,
+            "height": frame.size.height,
+        }
         
         content_filter = SCContentFilter.alloc().initWithDesktopIndependentWindow_(
             minecraft_window
@@ -107,6 +118,8 @@ class MinecraftCapture:
         self._stream = None
         self._receiver = None
         self._callback_queue = None
+        
+        self.window_bounds = None
 
 
 class FrameReceiver(NSObject, protocols=[objc.protocolNamed("SCStreamOutput")]):

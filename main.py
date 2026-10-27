@@ -1,38 +1,47 @@
+
 """
     main.py
-    Application entry point for V-HMRC
+    Application entry point for V-HMRC.
 """
 
-# pyright: reportAttributeAccessIssue=false
+import sys
 
-import time
-
-from AppKit import NSApplication
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication
 from capture import MinecraftCapture
+from detector import detect_magenta_objects
+from overlay import MinecraftOverlay
 
 
 def main():
-    NSApplication.sharedApplication()
+    application = QApplication(sys.argv)
 
     mc = MinecraftCapture(target_fps=30)
     mc.start()
 
     try:
-        for _ in range(5):
-            time.sleep(1)
+        overlay = MinecraftOverlay(mc.window_bounds)
+        overlay.show()
 
+        def refresh_overlay():
             frame = mc.get_latest_frame()
 
             if frame is None:
-                print("Waiting for first frame...")
-                continue
+                return
 
-            print(f"Latest frame: {frame.shape}")
+            detections = detect_magenta_objects(frame)
+            overlay.update_detections(detections)
+
+        detection_timer = QTimer()
+        detection_timer.timeout.connect(refresh_overlay)
+        detection_timer.start(100)
+
+        QTimer.singleShot(30000, application.quit)
+        application.exec()
 
     finally:
         mc.stop()
-    
+
+
 if __name__ == "__main__":
     main()
-
-
