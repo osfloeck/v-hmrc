@@ -8,5 +8,9 @@ dependencies = [
     "mss>=10.2.0",
     "numpy>=2.5.4",
     "opencv-python>=5.0.0.93",
+    "pyobjc-framework-coremedia>=12.2.2",
+    "pyobjc-framework-libdispatch>=12.2.2",
     "pyobjc-framework-quartz>=12.2.2",
+    "pyobjc-framework-screencapturekit>=12.2.2",
+    "pyside6>=6.12.0",
 ]
